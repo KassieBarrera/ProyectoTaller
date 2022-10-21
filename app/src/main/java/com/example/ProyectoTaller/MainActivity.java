@@ -24,9 +24,6 @@ import java.net.Proxy;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText txt1;
-    private TextView txt2;
-    private Button btn;
     String valor, msj;
     String resultado="";
     SoapPrimitive resultString;
