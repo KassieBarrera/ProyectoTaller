@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,107 +25,102 @@ import java.net.Proxy;
 
 public class MainActivity extends AppCompatActivity {
 
-    String valor, msj;
-    String resultado="";
-    SoapPrimitive resultString;
+    String id, msj;
+    String resultado = "";
+    Object resultString;
+    private TextView result;
+
+    String URL = "http://25.3.113.141:8080/WS_TALLER/wsOrden?WSDL";
+    String NAMESPACE = "http://servicio/";
+    String METHOD_NAME = "getOrdenById";
+    String SOAP_ACTION = "http://servicio/wsOrden/getOrdenByIdRequest";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-    }
-
-    private class segundoPlano extends AsyncTask<String,Void,String>{
-
-        @Override
-        protected String doInBackground(String... params) {
-            return consumoWsTipoCambio();
-        }
-
-        @Override
-        protected void onPreExecute(){
-        }
-
-
-        @Override
-        protected void onPostExecute(String s) {
-            txt2.setText(s);
-        }
+        EditText searchId = findViewById(R.id.global_search);
+        result = findViewById(R.id.result);
+        searchId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                id = textView.getEditableText().toString();
+               WebServicePostData exec = new WebServicePostData();
+               exec.execute();
+                return false;
+            }
+        });
 
     }
 
 
-    private final HttpTransportSE getHttpTransportSE(String MAIN_REQUEST_URL) {
-        HttpTransportSE ht = new HttpTransportSE(Proxy.NO_PROXY,MAIN_REQUEST_URL,60000);
-        ht.debug = true;
-        ht.setXmlVersionTag("<!--?xml version=\"1.0\" encoding= \"UTF-8\" ?-->");
-        return ht;
+    private class WebServicePostData extends  AsyncTask<String, Void, String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+
+                SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+                request.addProperty("", id);
+                SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                soapEnvelope.dotNet = true;
+                soapEnvelope.setOutputSoapObject(request);
+
+                HttpTransportSE transportSE = new HttpTransportSE(URL);
+                transportSE.call(SOAP_ACTION, soapEnvelope);
+                resultString = soapEnvelope.getResponse();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
     }
-    public String consumoWsTipoCambio(){
-        String SOAP_ACTION = "http://www.banguat.gob.gt/variables/ws/TipoCambioDia";
-        String METHOD_NAME = "TipoCambioDia";
-        String NAMESPACE = "http://www.banguat.gob.gt/variables/ws/";
-        String URL = "http://www.banguat.gob.gt/variables/ws/TipoCambio.asmx";
 
-        try{
-            SoapObject request =  new SoapObject(NAMESPACE, METHOD_NAME);
+    public String wsGetOrderBy() {
+        String METHOD_NAME = "getOrdenById";
+        String NAMESPACE = "http://servicio/";
+        String URL = "http://25.3.113.141:8080/WS_TALLER/wsOrden?WSDL";
+        String SOAP_ACTION = NAMESPACE + METHOD_NAME;
 
-            //request.addProperty("Fro");
+        try {
+            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+            //request.addProperty("", id);
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
             soapEnvelope.dotNet = true;
             soapEnvelope.implicitTypes = true;
             soapEnvelope.setOutputSoapObject(request);
-            HttpTransportSE httpTransport =  getHttpTransportSE(URL);
+            //  HttpTransportSE httpTransport = getHttpTransportSE(URL);
 
-            try {
+            //  httpTransport.call(SOAP_ACTION, soapEnvelope);
+            //resultString = (SoapPrimitive) soapEnvelope.getResponse();
 
-                httpTransport.call(SOAP_ACTION, soapEnvelope);
-                //resultString = (SoapPrimitive) soapEnvelope.getResponse();
-
-                //txt2.setText(resultString.toString());
-            } catch (HttpResponseException e) {
-                // TODO Auto-generated catch block
-                Log.e("HTTPLOG", e.getMessage());
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                Log.e("IOLOG", e.getMessage());
-                e.printStackTrace();
-            } catch (XmlPullParserException e) {
-                // TODO Auto-generated catch block
-                Log.e("XMLLOG", e.getMessage());
-                e.printStackTrace();
-            } //send request
 
 
             try {
-                SoapObject soapObject = (SoapObject)soapEnvelope.getResponse();
-                soapObject = (SoapObject) soapObject.getProperty("CambioDolar");
-                soapObject = (SoapObject) soapObject.getProperty("VarDolar");
-                String fecha = soapObject.getProperty("fecha").toString();
-                String referencia = soapObject.getProperty("referencia").toString();
-                double tipoCambio = Double.parseDouble(referencia);
-                double total = Double.parseDouble(txt1.getText().toString()) * tipoCambio;
+                SoapObject soapObject = (SoapObject) soapEnvelope.getResponse();
+                soapObject = (SoapObject) soapObject.getProperty("response");
+                String cliente = soapObject.getProperty("cliente").toString();
+                String equipo = soapObject.getProperty("equipo").toString();
+                String estado = soapObject.getProperty("estado").toString();
+                String numeroOrden = soapObject.getProperty("numeroOrden").toString();
+                String observaciones = soapObject.getProperty("observaciones").toString();
 
-                resultado = String.valueOf(total);
-                //txt2.setText(resultado);
+                resultado = String.valueOf(cliente);
 
-                Log.i("RESPONSE",String.valueOf(soapObject)); // see output in the console
+                Log.i("RESPONSE", String.valueOf(soapObject)); // see output in the console
             } catch (SoapFault e) {
                 // TODO Auto-generated catch block
                 Log.e("SOAPLOG", e.getMessage());
                 e.printStackTrace();
             }
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             msj = "ERROR: " + ex.getMessage();
             Toast.makeText(getApplicationContext(),
-                    "Fracaso", Toast.LENGTH_SHORT);
+                    "Fracaso", Toast.LENGTH_SHORT).show();
         }
-
         return resultado;
-
     }
 
 }
