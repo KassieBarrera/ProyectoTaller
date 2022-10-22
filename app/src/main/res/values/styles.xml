@@ -3,9 +3,18 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/verde_claro</item>
-        <item name="colorPrimaryDark">@color/verde_claro</item>
-        <item name="colorAccent">@color/beige</item>
+        <item name="colorPrimary">@color/gris</item>
+        <item name="colorPrimaryDark">@color/bg</item>
+        <item name="colorAccent">@color/acent</item>
     </style>
 
+    <style name="textTitle">
+        <item name="color">@color/blanco</item>
+        <item name="android:textSize">35dp</item>
+    </style>
+
+    <style name="editText">
+        <item name="android:textColor">@color/blanco</item>
+        <item name="hintTextColor">@color/beige</item>
+    </style>
 </resources>

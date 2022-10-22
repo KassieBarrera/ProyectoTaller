@@ -4,15 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/verde_claro"
+    android:background="@color/acent"
     tools:context=".SplashScreen">
 
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_centerVertical="true"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_centerHorizontal="true"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="100dp"
+        android:src="@drawable/logotaller"
+        android:layout_height="100dp"/>
     <TextView
         android:layout_width="match_parent"
         android:gravity="center"
         android:textSize="35dp"
         android:layout_centerVertical="true"
-        android:textColor="@color/blanco"
+        android:textColor="@color/bg"
         android:text="@string/app_name"
         android:layout_height="wrap_content"/>
+</LinearLayout>
 </RelativeLayout>
