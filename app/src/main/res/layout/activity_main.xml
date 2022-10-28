@@ -9,6 +9,7 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:visibility="gone"
         android:id="@+id/ll_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,11 +37,12 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_orders"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/ll_search"
         android:layout_marginTop="30dp"
-        tools:listitem="@layout/order_detail"
-        android:layout_height="wrap_content"/>
+        tools:listitem="@layout/order_detail" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_info"

@@ -13,6 +13,12 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Detalle"
+            android:exported="false" />
+        <activity
+            android:name=".ListMenu"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false">
             <meta-data
@@ -21,7 +27,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="false"></activity>
+            android:exported="false" />
         <activity
             android:name=".SplashScreen"
             android:exported="true">

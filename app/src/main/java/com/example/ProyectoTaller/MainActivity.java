@@ -1,52 +1,52 @@
 package com.example.ProyectoTaller;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.util.Log;
+
+import com.example.ProyectoTaller.Adapter.ItemAdapter;
+import com.example.ProyectoTaller.Model.OrderItem;
 
 import org.ksoap2.SoapEnvelope;
-import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpResponseException;
 import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
-import java.net.Proxy;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    String msj, res;
-    int idSearch = 0;
-    TextView cliente, estado;
-    TextView equipo, tecnico, observacion;
-    CardView cardInfo;
 
+    ArrayList <OrderItem> itemsList = new ArrayList<OrderItem>();
+    String idUser;
+    ItemAdapter adaptador;
+    RecyclerView rv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        EditText searchId = findViewById(R.id.global_search);
-        cliente = findViewById(R.id.cliente);
-        equipo = findViewById(R.id.equipo);
-        tecnico = findViewById(R.id.tecnico);
-        observacion = findViewById(R.id.observacion);
-        estado = findViewById(R.id.estado);
-        cardInfo = findViewById(R.id.card_info);
-        ImageView img= findViewById(R.id.img_search);
 
-      
-        searchId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+       idUser =  getIntent().getStringExtra("idUser");
+        rv = findViewById(R.id.list_orders);
+
+
+
+        itemsList.add(new OrderItem("Kassie", "iPhone", "En limpieza", "1002", "El dispositivo presentaba mucho polvo", "Emily Morales"));
+        itemsList.add(new OrderItem("Kassie", "iPhone", "En limpieza", "1002", "El dispositivo presentaba mucho polvo", "Emily Morales"));
+        itemsList.add(new OrderItem("Kassie", "iPhone", "En limpieza", "1002", "El dispositivo presentaba mucho polvo", "Emily Morales"));
+
+
+
+        adaptador = new ItemAdapter(itemsList, getApplicationContext());
+        rv.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        rv.setAdapter(adaptador);
+
+
+       /* searchId.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 idSearch = Integer.parseInt(textView.getEditableText().toString());
@@ -58,15 +58,16 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-        });
+        });*/
 
     }
 
-    private class segundoPlano extends AsyncTask<String, Void, String> {
+
+    private class menuConection extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
-            return wsTest();
+            return wsMenuList();
         }
 
         @Override
@@ -81,63 +82,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setText_(final TextView text,final String value){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                text.setText(value);
-            }
-        });
-    }
-
-    private final HttpTransportSE getHttpTransportSE(String MAIN_REQUEST_URL) {
-        HttpTransportSE ht = new HttpTransportSE(Proxy.NO_PROXY, MAIN_REQUEST_URL, 60000);
-        ht.debug = true;
-        ht.setXmlVersionTag("<!--?xml version=\"1.0\" encoding= \"UTF-8\" ?-->");
-        return ht;
-    }
-
-
-    public String wsTest() {
-        String METHOD_NAME = "getOrdenById";
+    public String wsMenuList() {
+        String METHOD_NAME = "getListaOrdenByCliente";
         String NAMESPACE = "http://servicio/";
         String URL = "http://25.3.113.141:8080/WS_TALLER/wsOrden?wsdl";
         String SOAP_ACTION = NAMESPACE + METHOD_NAME;
 
 
-        try {
-            SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
+        SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME);
 
-            //se añade aca el id de la orden en vez del 1012
-            request.addProperty("arg0", idSearch);
+        request.addProperty("arg0", 4);
 
+
+        try  {
 
             SoapSerializationEnvelope soapEnvelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-
-            soapEnvelope.dotNet = false;
-            soapEnvelope.setOutputSoapObject(request);
-
             HttpTransportSE transport = new HttpTransportSE(URL);
-
             transport.call(SOAP_ACTION, soapEnvelope);
 
-
-            SoapObject soapObject = (SoapObject) soapEnvelope.getResponse();
-            /*se solicitan aca los elementos de la respuesta del ws*/
-            setText_(cliente, soapObject.getProperty("cliente").toString());
-            setText_(estado, soapObject.getProperty("estado").toString());
-            setText_(equipo, soapObject.getProperty("equipo").toString());
-            setText_(tecnico, soapObject.getProperty("tecnico").toString());
-            setText_(observacion, soapObject.getProperty("observaciones").toString());
+            SoapObject response = (SoapObject) soapEnvelope.bodyIn;
 
 
-        } catch (Exception ex) {
-            msj = "error!! " + ex.getMessage();
-            System.out.println(msj);
-
+        }  catch (Exception exception)   {
+            Log.e("MainError:", exception.toString());
         }
-
-        return res;
+        return "";
     }
 
 
